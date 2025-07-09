@@ -7,6 +7,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface LibroRepository extends JpaRepository<Libro, Long> {
+    // Método corregido para verificar existencia
+    boolean existsByTituloAndAutores(String titulo, String autores);
+
     // Buscar por título (insensible a mayúsculas)
     List<Libro> findByTituloContainingIgnoreCase(String titulo);
 
@@ -26,7 +29,4 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
 
     // Libros con más de X descargas
     List<Libro> findByDescargasGreaterThan(int descargas);
-
-    // Verificar si un libro ya existe
- boolean existsByTituloAndAutores(String titulo, String autores);
 }

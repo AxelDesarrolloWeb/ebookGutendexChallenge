@@ -75,12 +75,12 @@ public class Principal {
                 // Convertir lista de autores a string
                 String autoresStr = convertirAutoresAString(datosLibro.authors());
 
-                // Verificar si ya existe
+                // Verificar si ya existe (CORREGIDO)
                 if (!repository.existsByTituloAndAutores(datosLibro.titulo(), autoresStr)) {
                     // Crear y guardar libro
                     Libro libro = new Libro();
                     libro.setTitulo(datosLibro.titulo());
-                    libro.setAutores(autoresStr);
+                    libro.setAutores(autoresStr); // Ahora es String
                     libro.setTemas(datosLibro.temas());
                     libro.setIdioma(!datosLibro.idiomas().isEmpty() ? datosLibro.idiomas().get(0) : "desconocido");
                     libro.setDescargas(datosLibro.descargas());
@@ -133,6 +133,7 @@ public class Principal {
         }
     }
 
+    // Método para convertir lista de autores a string
     private String convertirAutoresAString(List<DatosAutor> autores) {
         if (autores == null || autores.isEmpty()) return "Anónimo";
         return autores.stream()

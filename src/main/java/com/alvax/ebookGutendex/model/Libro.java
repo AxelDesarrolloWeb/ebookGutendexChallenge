@@ -8,15 +8,15 @@ import java.util.List;
 public class Libro {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String titulo;
 
     @Column(columnDefinition = "TEXT")
-    private List<String> autores; // Almacenar como texto separado por comas
+    private String autores; // Ahora es String, no List<String>
 
     @ElementCollection
-    private List<String> temas;
+    private List<String> temas; // Mantener como lista pero sin @Enumerated
 
     private String idioma;
     private int descargas;
@@ -29,11 +29,11 @@ public class Libro {
     public Libro(){}
 
     public Libro(DatosLibro datosLibro) {
-        this.id = datosLibro.id();
+        this.id = (long) datosLibro.id();
         this.titulo = datosLibro.title();
-        this.autores = datosLibro.authors().stream()
+        this.autores = String.valueOf(datosLibro.authors().stream()
                 .map(DatosAutor::name)
-                .toList();
+                .toList());
 
         this.temas = datosLibro.subjects();
 
@@ -50,7 +50,7 @@ public class Libro {
 
     // Getters
 
-    public int getId() {
+    public Long getId() {
 
         return id;
 
@@ -66,7 +66,7 @@ public class Libro {
 
 
 
-    public List<String> getAutores() {
+    public String getAutores() {
 
         return autores;
 
@@ -108,7 +108,7 @@ public class Libro {
 
     public void setId(int id) {
 
-        this.id = id;
+        this.id = (long) id;
 
     }
 
