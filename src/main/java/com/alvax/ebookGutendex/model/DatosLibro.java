@@ -2,22 +2,24 @@ package com.alvax.ebookGutendex.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+// DatosLibro.java
 public record DatosLibro(
-        String title,
-        int id,
-        List<DatosAutor> authors,
-        List<String> subjects,
-        List<String> languages,
-        int download_count,
-        String formattedTextUrl) {
+        @JsonProperty("id") int id,
+        @JsonProperty("title") String title,
+        @JsonProperty("authors") List<DatosAutor> authors,
+        @JsonProperty("subjects") List<String> subjects,
+        @JsonProperty("languages") List<String> languages,
+        @JsonProperty("download_count") int download_count) {
 
     public String titulo() { return title; }
+    public List<DatosAutor> autores() { return authors; }
     public List<String> temas() { return subjects; }
     public List<String> idiomas() { return languages; }
     public int descargas() { return download_count; }
-    public String urlTexto() { return formattedTextUrl; }
+    public int id() { return id; } // AÑADIDO: Getter para ID
 }

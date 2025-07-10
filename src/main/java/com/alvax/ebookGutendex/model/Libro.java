@@ -42,7 +42,7 @@ public class Libro {
 
         this.descargas = datosLibro.download_count();
 
-        this.urlTexto = datosLibro.formattedTextUrl();
+        this.urlTexto = datosLibro.titulo();
 
     }
 
@@ -104,23 +104,17 @@ public class Libro {
 
     }
 
-
-
     public void setId(int id) {
 
         this.id = (long) id;
 
     }
 
-
-
     public void setTitulo(String titulo) {
 
         this.titulo = titulo;
 
     }
-
-
 
     public void setAutores(String autoresStr) {
 
@@ -130,14 +124,11 @@ public class Libro {
 //    public void setAutores(String autoresStr) {
 //    }
 
-
     public void setTemas(List<String> temas) {
 
         this.temas = temas;
 
     }
-
-
 
     public void setIdioma(String idioma) {
 
@@ -145,15 +136,11 @@ public class Libro {
 
     }
 
-
-
     public void setDescargas(int descargas) {
 
         this.descargas = descargas;
 
     }
-
-
 
     public void setUrlTexto(String urlTexto) {
 
@@ -161,25 +148,13 @@ public class Libro {
 
     }
 
-
-
     @Override
-
     public String toString() {
-
         return "Libro{" +
-
                 "titulo='" + titulo + '\'' +
-
                 ", autores=" + autores +
-
                 ", idioma='" + idioma + '\'' +
-
                 ", descargas=" + descargas +
-
                 '}';
-
     }
-
-
 }

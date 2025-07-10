@@ -4,18 +4,26 @@ import com.alvax.ebookGutendex.model.*;
 import com.alvax.ebookGutendex.repository.LibroRepository;
 import com.alvax.ebookGutendex.service.ConsumoAPI;
 import com.alvax.ebookGutendex.service.ConvierteDatos;
+import org.springframework.stereotype.Component;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Component
 public class Principal {
     private Scanner teclado = new Scanner(System.in);
     private ConsumoAPI consumoApi = new ConsumoAPI();
+    // CORRECCIÓN: URL correcta para Gutendex API
     private final String URL_BASE = "https://gutendex.com/books?search=";
     private ConvierteDatos conversor = new ConvierteDatos();
     private LibroRepository repository;
 
-    public Principal() {
+    public Principal(LibroRepository repository) {
         this.repository = repository;
+    }
+
+    public Principal() {
+
     }
 
     public void muestraElMenu() {
@@ -66,25 +74,34 @@ public class Principal {
     private void buscarLibrosPorTitulo() {
         System.out.println("Ingrese el título a buscar:");
         var titulo = teclado.nextLine();
+        // CORRECCIÓN: Usar URL correcta y encoding adecuado
         var json = consumoApi.obtenerDatos(URL_BASE + titulo.replace(" ", "%20"));
+
+        // Depuración: Imprimir JSON para verificar respuesta
+        System.out.println("Respuesta de la API:\n" + json);
+
         DatosGutendex respuesta = conversor.obtenerDatos(json, DatosGutendex.class);
 
-        if (respuesta != null && respuesta.resultados() != null) {
+        if (respuesta != null && respuesta.results() != null && !respuesta.results().isEmpty()) {
             System.out.println("\n=== RESULTADOS DE BÚSQUEDA ===");
-            for (DatosLibro datosLibro : respuesta.resultados()) {
-                // Convertir lista de autores a string
-                String autoresStr = convertirAutoresAString(datosLibro.authors());
+            for (DatosLibro datosLibro : respuesta.results()) {
+                String autoresStr = convertirAutoresAString(datosLibro.autores());
 
-                // Verificar si ya existe (CORREGIDO)
                 if (!repository.existsByTituloAndAutores(datosLibro.titulo(), autoresStr)) {
-                    // Crear y guardar libro
                     Libro libro = new Libro();
                     libro.setTitulo(datosLibro.titulo());
-                    libro.setAutores(autoresStr); // Ahora es String
+                    libro.setAutores(autoresStr);
                     libro.setTemas(datosLibro.temas());
-                    libro.setIdioma(!datosLibro.idiomas().isEmpty() ? datosLibro.idiomas().get(0) : "desconocido");
+
+                    // CORRECCIÓN: Manejar múltiples idiomas
+                    libro.setIdioma(!datosLibro.idiomas().isEmpty() ?
+                            datosLibro.idiomas().get(0) : "desconocido");
+
                     libro.setDescargas(datosLibro.descargas());
-                    libro.setUrlTexto(datosLibro.urlTexto());
+
+                    // CORRECCIÓN: Construir URL usando ID del libro
+                    libro.setUrlTexto("https://www.gutenberg.org/ebooks/" +
+                            datosLibro.id() + ".txt.utf-8");
 
                     repository.save(libro);
                     mostrarLibro(libro);
@@ -102,24 +119,32 @@ public class Principal {
         System.out.println("Ingrese el nombre del autor:");
         var autor = teclado.nextLine();
         var json = consumoApi.obtenerDatos(URL_BASE + autor.replace(" ", "%20"));
+
+        // Depuración: Imprimir JSON para verificar respuesta
+        System.out.println("Respuesta de la API:\n" + json);
+
         DatosGutendex respuesta = conversor.obtenerDatos(json, DatosGutendex.class);
 
-        if (respuesta != null && respuesta.resultados() != null) {
+        if (respuesta != null && respuesta.results() != null && !respuesta.results().isEmpty()) {
             System.out.println("\n=== RESULTADOS DE BÚSQUEDA ===");
-            for (DatosLibro datosLibro : respuesta.resultados()) {
-                // Convertir lista de autores a string
+            for (DatosLibro datosLibro : respuesta.results()) {
                 String autoresStr = convertirAutoresAString(datosLibro.authors());
 
-                // Verificar si ya existe
                 if (!repository.existsByTituloAndAutores(datosLibro.titulo(), autoresStr)) {
-                    // Crear y guardar libro
                     Libro libro = new Libro();
                     libro.setTitulo(datosLibro.titulo());
                     libro.setAutores(autoresStr);
                     libro.setTemas(datosLibro.temas());
-                    libro.setIdioma(!datosLibro.idiomas().isEmpty() ? datosLibro.idiomas().get(0) : "desconocido");
+
+                    // CORRECCIÓN: Manejar múltiples idiomas
+                    libro.setIdioma(!datosLibro.idiomas().isEmpty() ?
+                            datosLibro.idiomas().get(0) : "desconocido");
+
                     libro.setDescargas(datosLibro.descargas());
-                    libro.setUrlTexto(datosLibro.urlTexto());
+
+                    // CORRECCIÓN: Construir URL usando ID del libro
+                    libro.setUrlTexto("https://www.gutenberg.org/ebooks/" +
+                            datosLibro.id() + ".txt.utf-8");
 
                     repository.save(libro);
                     mostrarLibro(libro);
@@ -133,11 +158,10 @@ public class Principal {
         }
     }
 
-    // Método para convertir lista de autores a string
     private String convertirAutoresAString(List<DatosAutor> autores) {
         if (autores == null || autores.isEmpty()) return "Anónimo";
         return autores.stream()
-                .map(a -> a.nombre())
+                .map(DatosAutor::nombre)
                 .collect(Collectors.joining(", "));
     }
 
@@ -146,7 +170,8 @@ public class Principal {
         System.out.println("Autor(es): " + libro.getAutores());
         System.out.println("Idioma: " + libro.getIdioma());
         System.out.println("Descargas: " + libro.getDescargas());
-        System.out.println("Temas: " + String.join(", ", libro.getTemas()));
+        System.out.println("Temas: " + (libro.getTemas() != null ?
+                String.join(", ", libro.getTemas()) : "N/A"));
         System.out.println("URL de texto: " + libro.getUrlTexto());
     }
 
