@@ -24,7 +24,7 @@ public class Principal {
 
     public void muestraElMenu() {
         var opcion = -1;
-        while (opcion != 7) {
+        while (opcion != 10) {
             var menu = """
                     ==== MENÚ PRINCIPAL ====
                     1. Buscar y guardar libros por título
@@ -81,19 +81,33 @@ public class Principal {
     }
 
     private void listarAutoresRegistrados() {
-//        List<Libro> topLibros = repository.findTop10ByOrderByDescargasDesc();
-//        System.out.println("Autores Registrados:");
-//        topLibros.forEach(this::mostrarLibro);
+        System.out.println("Autores registrados/guardados:");
+        List<Object[]> resultados = repository.findDistinctAutoresConAnios();
+
+        if (resultados.isEmpty()) {
+            System.out.println("\nNo se encontraron autores registrados...");
+            return;
+        }
+
+        System.out.println("\nLista de Autores registrados:");
+        for (Object[] resultado : resultados) {
+            String nombre = (String) resultado[0];
+            Integer birthYear = (Integer) resultado[1];
+            Integer deathYear = (Integer) resultado[2];
+
+            String infoAutor = nombre;
+            if (birthYear != null && deathYear != null) {
+                infoAutor += " (" + birthYear + "-" + deathYear + ")";
+            }
+            System.out.println(infoAutor);
+        }
     }
 
-    private void buscarAutoresVivos() {
-        
-    }
 
     private void listarLibrosRegistrados() {
-//        List<Libro> topLibros = repository.findTop10ByOrderByDescargasDesc();
-//        System.out.println("Libros Registrados:");
-//        topLibros.forEach(this::mostrarLibro);
+        List<Libro> libros = repository.findByOrderByDescargasDesc();
+        System.out.println("\n===LIBROS REGISTRADOS ===");
+        libros.forEach(this::mostrarLibro);
     }
 
     private void buscarLibrosPorTitulo() {
@@ -147,34 +161,34 @@ public class Principal {
         }
     }
 
-//    private void buscarAutoresVivosEnAnio() {
-//        try {
-//            System.out.println("Ingrese el año para ver los autores vivos en ese año:");
-//            int anio = teclado.nextInt();
-//            teclado.nextLine(); // Limpiar buffer
-//
-//            List<Libro> libros = repository.findAutoresVivosEnAnio(anio);
-//            Set<String> autoresUnicos = new HashSet<>();
-//
-//            for (Libro libro : libros) {
-//                if (libro.getAutores() != null) {
-//                    autoresUnicos.add(libro.getAutores());
-//                }
-//            }
-//
-//            if (autoresUnicos.isEmpty()) {
-//                System.out.println("\nNo se encontraron autores vivos en el año " + anio);
-//                return;
-//            }
-//
-//            System.out.println("\n=== AUTORES VIVOS EN EL AÑO " + anio + " ===");
-//            autoresUnicos.forEach(System.out::println);
-//
-//        } catch (InputMismatchException e) {
-//            System.out.println("Debe ingresar un número válido");
-//            teclado.nextLine(); // Limpiar entrada inválida
-//        }
-//    }
+    private void buscarAutoresVivos() {
+        try {
+            System.out.println("Ingrese el año para ver los autores vivos en ese año:");
+            int anio = teclado.nextInt();
+            teclado.nextLine(); // Limpiar buffer
+
+            List<Libro> libros = repository.findAutoresVivosEnAnio(anio);
+            Set<String> autoresUnicos = new HashSet<>();
+
+            for (Libro libro : libros) {
+                if (libro.getAutores() != null) {
+                    autoresUnicos.add(libro.getAutores());
+                }
+            }
+
+            if (autoresUnicos.isEmpty()) {
+                System.out.println("\nNo se encontraron autores vivos en el año " + anio);
+                return;
+            }
+
+            System.out.println("\n=== AUTORES VIVOS EN EL AÑO " + anio + " ===");
+            autoresUnicos.forEach(System.out::println);
+
+        } catch (InputMismatchException e) {
+            System.out.println("Debe ingresar un número válido");
+            teclado.nextLine(); // Limpiar entrada inválida
+        }
+    }
 
     private void buscarLibrosPorAutor() {
         System.out.println("Ingrese el nombre del autor:");
