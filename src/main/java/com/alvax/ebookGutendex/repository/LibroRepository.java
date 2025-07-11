@@ -17,16 +17,20 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
     @Query("SELECT l FROM Libro l WHERE LOWER(l.autores) LIKE LOWER(CONCAT('%', :autor, '%'))")
     List<Libro> findByAutor(@Param("autor") String autor);
 
-    // Top 10 libros más descargados
+    @Query("SELECT DISTINCT l FROM Libro l LEFT JOIN FETCH l.temas ORDER BY l.descargas DESC LIMIT 10")
     List<Libro> findTop10ByOrderByDescargasDesc();
 
-    // Libros por idioma
-    List<Libro> findByIdioma(String idioma);
+    @Query("SELECT DISTINCT l FROM Libro l LEFT JOIN FETCH l.temas WHERE l.idioma = :idioma")
+    List<Libro> findByIdioma(@Param("idioma") String idioma);
 
-    // Buscar libros por tema
-    @Query("SELECT l FROM Libro l JOIN l.temas t WHERE LOWER(t) LIKE LOWER(CONCAT('%', :tema, '%'))")
+    @Query("SELECT DISTINCT l FROM Libro l JOIN FETCH l.temas t WHERE LOWER(t) LIKE LOWER(CONCAT('%', :tema, '%'))")
     List<Libro> findByTema(@Param("tema") String tema);
 
-    // Libros con más de X descargas
-    List<Libro> findByDescargasGreaterThan(int descargas);
+    @Query("SELECT DISTINCT l FROM Libro l LEFT JOIN FETCH l.temas WHERE l.descargas > :descargas")
+    List<Libro> findByDescargasGreaterThan(@Param("descargas") int descargas);
+
+//    @Query("SELECT DISTINCT l FROM Libro l WHERE " +
+//            "l.birthYearAutor <= :anio AND " +
+//            "l.deathYearAutor >= :anio")
+//    List<Libro> findAutoresVivosEnAnio(@Param("anio") int anio);
 }

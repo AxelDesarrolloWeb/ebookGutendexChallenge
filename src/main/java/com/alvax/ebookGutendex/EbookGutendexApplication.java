@@ -14,6 +14,7 @@ public class EbookGutendexApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(EbookGutendexApplication.class, args);
 	}
+
 	@Bean
 	public CommandLineRunner run(Principal principal) {
 		return args -> {

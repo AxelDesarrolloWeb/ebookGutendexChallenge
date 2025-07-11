@@ -22,23 +22,23 @@ public class Principal {
         this.repository = repository;
     }
 
-    public Principal() {
-
-    }
-
     public void muestraElMenu() {
         var opcion = -1;
         while (opcion != 7) {
             var menu = """
                     ==== MENÚ PRINCIPAL ====
-                    1. Buscar libros por título
-                    2. Buscar libros por autor
-                    3. Top 10 libros más descargados
-                    4. Libros por idioma
-                    5. Buscar libros por tema
-                    6. Libros con más de 25000 descargas
-                    7. Salir
+                    1. Buscar y guardar libros por título
+                    2. Buscar y guardar libros por autor 
+                    3. Listar libros registrados
+                    4. Listar autores registrados
+                    5. Top 10 libros más descargados
+                    6. Libros por idioma
+                    7. Buscar libros por tema
+                    8. Libros con más de 25000 descargas
+                    9. Buscar autores vivos de la época
+                    10. Salir
                     Seleccione una opción:""";
+
             System.out.println(menu);
             opcion = teclado.nextInt();
             teclado.nextLine();
@@ -51,24 +51,49 @@ public class Principal {
                     buscarLibrosPorAutor();
                     break;
                 case 3:
-                    mostrarTop10Descargados();
+                    listarLibrosRegistrados();
                     break;
                 case 4:
-                    buscarLibrosPorIdioma();
+                    listarAutoresRegistrados();
                     break;
                 case 5:
-                    buscarLibrosPorTema();
+                    mostrarTop10Descargados();
                     break;
                 case 6:
-                    buscarLibrosConMasDe25000Descargas();
+                    buscarLibrosPorIdioma();
                     break;
                 case 7:
+                    buscarLibrosPorTema();
+                    break;
+                case 8:
+                    buscarLibrosConMasDe25000Descargas();
+                    break;
+                case 9:
+                    buscarAutoresVivos();
+                    break;
+                case 10:
                     System.out.println("Cerrando la aplicación...");
                     break;
                 default:
                     System.out.println("Opción inválida");
             }
         }
+    }
+
+    private void listarAutoresRegistrados() {
+//        List<Libro> topLibros = repository.findTop10ByOrderByDescargasDesc();
+//        System.out.println("Autores Registrados:");
+//        topLibros.forEach(this::mostrarLibro);
+    }
+
+    private void buscarAutoresVivos() {
+        
+    }
+
+    private void listarLibrosRegistrados() {
+//        List<Libro> topLibros = repository.findTop10ByOrderByDescargasDesc();
+//        System.out.println("Libros Registrados:");
+//        topLibros.forEach(this::mostrarLibro);
     }
 
     private void buscarLibrosPorTitulo() {
@@ -93,6 +118,13 @@ public class Principal {
                     libro.setAutores(autoresStr);
                     libro.setTemas(datosLibro.temas());
 
+                    // Guardar años del primer autor (si existe)
+                    if (!datosLibro.autores().isEmpty()) {
+                        DatosAutor primerAutor = datosLibro.autores().get(0);
+                        libro.setBirthYearAutor(primerAutor.birth_year());
+                        libro.setDeathYearAutor(primerAutor.death_year());
+                    }
+
                     // CORRECCIÓN: Manejar múltiples idiomas
                     libro.setIdioma(!datosLibro.idiomas().isEmpty() ?
                             datosLibro.idiomas().get(0) : "desconocido");
@@ -114,6 +146,35 @@ public class Principal {
             System.out.println("No se encontraron libros para: " + titulo);
         }
     }
+
+//    private void buscarAutoresVivosEnAnio() {
+//        try {
+//            System.out.println("Ingrese el año para ver los autores vivos en ese año:");
+//            int anio = teclado.nextInt();
+//            teclado.nextLine(); // Limpiar buffer
+//
+//            List<Libro> libros = repository.findAutoresVivosEnAnio(anio);
+//            Set<String> autoresUnicos = new HashSet<>();
+//
+//            for (Libro libro : libros) {
+//                if (libro.getAutores() != null) {
+//                    autoresUnicos.add(libro.getAutores());
+//                }
+//            }
+//
+//            if (autoresUnicos.isEmpty()) {
+//                System.out.println("\nNo se encontraron autores vivos en el año " + anio);
+//                return;
+//            }
+//
+//            System.out.println("\n=== AUTORES VIVOS EN EL AÑO " + anio + " ===");
+//            autoresUnicos.forEach(System.out::println);
+//
+//        } catch (InputMismatchException e) {
+//            System.out.println("Debe ingresar un número válido");
+//            teclado.nextLine(); // Limpiar entrada inválida
+//        }
+//    }
 
     private void buscarLibrosPorAutor() {
         System.out.println("Ingrese el nombre del autor:");
@@ -170,8 +231,14 @@ public class Principal {
         System.out.println("Autor(es): " + libro.getAutores());
         System.out.println("Idioma: " + libro.getIdioma());
         System.out.println("Descargas: " + libro.getDescargas());
-        System.out.println("Temas: " + (libro.getTemas() != null ?
-                String.join(", ", libro.getTemas()) : "N/A"));
+
+        // Manejo seguro de temas
+        if (libro.getTemas() != null && !libro.getTemas().isEmpty()) {
+            System.out.println("Temas: " + String.join(", ", libro.getTemas()));
+        } else {
+            System.out.println("Temas: N/A");
+        }
+
         System.out.println("URL de texto: " + libro.getUrlTexto());
     }
 

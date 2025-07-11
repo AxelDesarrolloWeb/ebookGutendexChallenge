@@ -15,16 +15,15 @@ public class Libro {
     @Column(columnDefinition = "TEXT")
     private String autores; // Ahora es String, no List<String>
 
-    @ElementCollection
-    private List<String> temas; // Mantener como lista pero sin @Enumerated
+    @ElementCollection(fetch = FetchType.EAGER) // Cambio clave aquí
+    private List<String> temas;
 
     private String idioma;
     private int descargas;
     private String urlTexto;
+    private Integer birth_year;  // Año de nacimiento del autor
+    private Integer death_year;  // Año de muerte del autor
 
-@ManyToOne
-    @JoinColumn(name = "autores_id")
-    private Autor autor;
 
     public Libro(){}
 
@@ -43,6 +42,7 @@ public class Libro {
         this.descargas = datosLibro.download_count();
 
         this.urlTexto = datosLibro.titulo();
+
 
     }
 
@@ -118,11 +118,9 @@ public class Libro {
 
     public void setAutores(String autoresStr) {
 
-        this.autores = autores;
+        this.autores = autoresStr;
 
     }
-//    public void setAutores(String autoresStr) {
-//    }
 
     public void setTemas(List<String> temas) {
 
@@ -146,6 +144,14 @@ public class Libro {
 
         this.urlTexto = urlTexto;
 
+    }
+
+    public void setBirthYearAutor(Integer birthYearAutor) {
+        this.birth_year = birthYearAutor;
+    }
+
+    public void setDeathYearAutor(Integer deathYearAutor) {
+        this.death_year = deathYearAutor;
     }
 
     @Override
